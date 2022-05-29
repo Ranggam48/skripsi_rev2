@@ -520,7 +520,7 @@ void PhaseATask(void const *argument) {
 			delay_us(50);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 			stateSensorPrv = stateSensorNow;
-			osDelay(1);
+			osDelay(2);
 		}
 
 	}
@@ -539,7 +539,7 @@ void PhaseBTask(void const *argument) {
 			delay_us(50);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 			stateSensorPrv = stateSensorNow;
-			osDelay(1);
+			osDelay(2);
 		}
 
 	}

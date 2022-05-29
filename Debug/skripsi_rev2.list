@@ -1197,8 +1197,8 @@ void PhaseATask(void const *argument) {
 			stateSensorPrv = stateSensorNow;
  8000834:	68bb      	ldr	r3, [r7, #8]
  8000836:	60fb      	str	r3, [r7, #12]
-			osDelay(1);
- 8000838:	2001      	movs	r0, #1
+			osDelay(2);
+ 8000838:	2002      	movs	r0, #2
  800083a:	f008 f976 	bl	8008b2a <osDelay>
 		stateSensorNow = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
  800083e:	e7d6      	b.n	80007ee <PhaseATask+0x1a>
@@ -1262,8 +1262,8 @@ void PhaseBTask(void const *argument) {
 			stateSensorPrv = stateSensorNow;
  80008a6:	68bb      	ldr	r3, [r7, #8]
  80008a8:	60fb      	str	r3, [r7, #12]
-			osDelay(1);
- 80008aa:	2001      	movs	r0, #1
+			osDelay(2);
+ 80008aa:	2002      	movs	r0, #2
  80008ac:	f008 f93d 	bl	8008b2a <osDelay>
 		stateSensorNow = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
  80008b0:	e7db      	b.n	800086a <PhaseBTask+0x1a>
