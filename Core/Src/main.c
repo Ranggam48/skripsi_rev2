@@ -492,7 +492,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 	else if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)) {
 
-		delay_us(delay);
+		delay_us(delay3);
 		if (delay1 + delay3 < 5600) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
 			delay_us(50);
