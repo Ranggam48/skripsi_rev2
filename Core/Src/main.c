@@ -455,17 +455,18 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 		delay_us(delay1);
 		if (delay1 < 2800) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-			delay_us(50);
+
 		}
 		if (delay2 + delay1 < 5600) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-			delay_us(50);
+
 		}
 		if (delay3 + delay1 + delay2 <= 8400) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-			delay_us(50);
+
 		}
 		if (counter > 0) {
+			delay_us(50);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
@@ -477,17 +478,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 		delay_us(delay2);
 		if (delay1 + delay2 + delay3 <= 8400) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-			delay_us(50);
+
 		}
 		if (delay2 < 2800) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-			delay_us(50);
 		}
 		if (delay3 + delay2 < 5600) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-			delay_us(50);
 		}
 		if (counter > 0) {
+			delay_us(50);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
@@ -499,17 +499,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 		delay_us(delay3);
 		if (delay1 + delay3 < 5600) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-			delay_us(50);
 		}
 		if (delay2 + delay3 + delay2 <= 8400) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-			delay_us(50);
 		}
 		if (delay3 < 2800) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-			delay_us(50);
 		}
 		if (counter > 0) {
+			delay_us(50);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
