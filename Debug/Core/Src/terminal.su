@@ -1,0 +1,2 @@
+../Core/Src/terminal.c:18:6:command_printf	272	static
+../Core/Src/terminal.c:33:6:terminal_proses	280	static
