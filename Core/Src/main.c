@@ -195,10 +195,10 @@ int main(void) {
 
 	/* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
-	osThreadDef(phaseATask, PhaseATask, osPriorityNormal, 0, 256);
+	osThreadDef(phaseATask, PhaseATask, osPriorityNormal, 0, 128);
 	phaseATaskHandle = osThreadCreate(osThread(phaseATask), NULL);
 
-	osThreadDef(phaseBTask, PhaseBTask, osPriorityNormal, 0, 256);
+	osThreadDef(phaseBTask, PhaseBTask, osPriorityNormal, 0, 128);
 	phaseBTaskHandle = osThreadCreate(osThread(phaseBTask), NULL);
 //
 //	osThreadDef(phaseCTask, PhaseCTask, osPriorityNormal, 0, 256);
@@ -520,7 +520,7 @@ void PhaseATask(void const *argument) {
 			delay_us(50);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 			stateSensorPrv = stateSensorNow;
-			osDelay(2);
+			osDelay(1);
 		}
 
 	}
@@ -539,7 +539,7 @@ void PhaseBTask(void const *argument) {
 			delay_us(50);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 			stateSensorPrv = stateSensorNow;
-			osDelay(2);
+			osDelay(1);
 		}
 
 	}
