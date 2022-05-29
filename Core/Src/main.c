@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -59,8 +60,11 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
 
+osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
-
+osThreadId phaseATaskHandle;
+osThreadId phaseBTaskHandle;
+osThreadId phaseCTaskHandle;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,8 +74,12 @@ static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
-/* USER CODE BEGIN PFP */
+void StartDefaultTask(void const *argument);
 
+/* USER CODE BEGIN PFP */
+void PhaseATask(void const *argument);
+void PhaseBTask(void const *argument);
+void PhaseCTask(void const *argument);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -158,13 +166,49 @@ int main(void) {
 	MX_TIM1_Init();
 	MX_USART1_UART_Init();
 	MX_TIM2_Init();
-	MX_USB_DEVICE_Init();
 	/* USER CODE BEGIN 2 */
 	EXTI_Stop();
 	HAL_TIM_Base_Start(&htim1);
-	counter = time * 100;
+	//counter = time * 100;
 	/* USER CODE END 2 */
 
+	/* USER CODE BEGIN RTOS_MUTEX */
+	/* add mutexes, ... */
+	/* USER CODE END RTOS_MUTEX */
+
+	/* USER CODE BEGIN RTOS_SEMAPHORES */
+	/* add semaphores, ... */
+	/* USER CODE END RTOS_SEMAPHORES */
+
+	/* USER CODE BEGIN RTOS_TIMERS */
+	/* start timers, add new ones, ... */
+	/* USER CODE END RTOS_TIMERS */
+
+	/* USER CODE BEGIN RTOS_QUEUES */
+	/* add queues, ... */
+	/* USER CODE END RTOS_QUEUES */
+
+	/* Create the thread(s) */
+	/* definition and creation of defaultTask */
+	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+	defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+	/* USER CODE BEGIN RTOS_THREADS */
+	/* add threads, ... */
+	osThreadDef(phaseATask, PhaseATask, osPriorityNormal, 0, 256);
+	phaseATaskHandle = osThreadCreate(osThread(phaseATask), NULL);
+
+	osThreadDef(phaseBTask, PhaseBTask, osPriorityNormal, 0, 256);
+	phaseBTaskHandle = osThreadCreate(osThread(phaseBTask), NULL);
+//
+//	osThreadDef(phaseCTask, PhaseCTask, osPriorityNormal, 0, 256);
+//	phaseCTaskHandle = osThreadCreate(osThread(phaseCTask), NULL);
+	/* USER CODE END RTOS_THREADS */
+
+	/* Start scheduler */
+	osKernelStart();
+
+	/* We should never get here as control is now taken by the scheduler */
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
@@ -413,7 +457,7 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pins : PA0 PA1 PA2 */
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2;
-	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -424,65 +468,134 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	/* EXTI interrupt init*/
-	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-	HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-
-	HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
 }
 
 /* USER CODE BEGIN 4 */
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+//
+//	if (GPIO_Pin == GPIO_PIN_0) {
+//
+//		delay_us(delay);
+//		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
+//		delay_us(50);
+//		if (counter > 0) {
+//			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+//		}
+//	}
+//
+//	else if (GPIO_Pin == GPIO_PIN_1) {
+//
+//		delay_us(delay);
+//		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+//		delay_us(50);
+//		if (counter > 0) {
+//			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+//		}
+//	}
+//
+//	else if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)) {
+//
+//		delay_us(delay);
+//		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
+//		delay_us(50);
+//		if (counter > 0) {
+//			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+//		}
+//	}
+//}
+/* USER CODE END 4 */
 
-	delay = 7200;
-	counter = counter - 10;
-	delay = MAP(counter, 0, time * 100, 200, 7200);
+void PhaseATask(void const *argument) {
+
+	int stateSensorNow = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	int stateSensorPrv = -1;
+
+	for (;;) {
+		stateSensorNow = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+		if (stateSensorNow != stateSensorPrv) {
+			count++;
+			delay_us(delay);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
+			delay_us(50);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+			stateSensorPrv = stateSensorNow;
+			osDelay(1);
+		}
+
+	}
+}
+
+void PhaseBTask(void const *argument) {
+
+	int stateSensorNow = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+	int stateSensorPrv = -1;
+
+	for (;;) {
+		stateSensorNow = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+		if (stateSensorNow != stateSensorPrv) {
+			delay_us(delay);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+			delay_us(50);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+			stateSensorPrv = stateSensorNow;
+			osDelay(1);
+		}
+
+	}
+}
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+ * @brief  Function implementing the defaultTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void const *argument) {
+	/* init code for USB_DEVICE */
+	MX_USB_DEVICE_Init();
+	/* USER CODE BEGIN 5 */
+	counter = 100;
+	/* Infinite loop */
+	for (;;) {
+		delay = MAP(counter, 0, 100, 0, 9000);
+		osDelay(100);
+		counter--;
+		if (counter == 0) {
+			counter = 100;
+		}
+	}
+	/* USER CODE END 5 */
+}
+
+/**
+ * @brief  Period elapsed callback in non blocking mode
+ * @note   This function is called  when TIM4 interrupt took place, inside
+ * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+ * a global variable "uwTick" used as application time base.
+ * @param  htim : TIM handle
+ * @retval None
+ */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	/* USER CODE BEGIN Callback 0 */
+
+	/* USER CODE END Callback 0 */
+	if (htim->Instance == TIM4) {
+		HAL_IncTick();
+	}
+	/* USER CODE BEGIN Callback 1 */
+	if (htim->Instance == TIM2) {
+		delay = 7200;
+		counter = counter - 10;
+		delay = MAP(counter, 0, time * 100, 200, 7200);
 //	persen = MAP(counter, 0, time * 100, 0, 100);
 //	sprintf(str, "%d persen\n", 100 - persen);
 //	CDC_Transmit_FS(str, sizeof(str));
-	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	}
+	/* USER CODE END Callback 1 */
 }
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-
-	if (GPIO_Pin == GPIO_PIN_0) {
-
-		delay_us(delay);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-		delay_us(50);
-		if (counter > 0) {
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-		}
-	}
-
-	else if (GPIO_Pin == GPIO_PIN_1) {
-
-		delay_us(delay);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-		delay_us(50);
-		if (counter > 0) {
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-		}
-	}
-
-	else if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)) {
-
-		delay_us(delay);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-		delay_us(50);
-		if (counter > 0) {
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
-		}
-	}
-}
-/* USER CODE END 4 */
 
 /**
  * @brief  This function is executed in case of error occurrence.
