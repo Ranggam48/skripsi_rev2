@@ -438,6 +438,7 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
+//-------- fungsi callback timer interrupt untuk konvert waktu starting ke delay(microsecond) -------//
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 	counter = counter - 10;
@@ -449,59 +450,73 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 }
 
+//-------------------------- fungsi callback untuk external interrupt pin A0, A1,dan A2 --------------------//
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
-	if (GPIO_Pin == GPIO_PIN_0) {
+	if (GPIO_Pin == GPIO_PIN_0) { // deteksi zvc untuk fasa R
 
 		delay_us(delay1);
-		if (delay1 + delay2 + delay3 < 2800) {
+		if (delay1 + delay2 + delay3 < 2800) { // pin 13 high ketika delay < 2800 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
 		}
-		if (delay1 + delay2 + delay3 < 5600) {
+		if (delay1 + delay2 + delay3 < 5600
+				&& delay1 + delay2 + delay3 > 2800) { // pin 14 high ketika delay < 5600 && delay > 2800 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
 		}
-		if (delay1 + delay2 + delay3 < 8400) {
+		if (delay1 + delay2 + delay3 < 8400
+				&& delay1 + delay2 + delay3 > 5600) { // pin 15 high ketika delay < 8400 && delay > 5600 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
 		}
 		delay_us(50);
 		if (counter > 0) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 		}
 	}
 
-	else if (GPIO_Pin == GPIO_PIN_1) {
+	else if (GPIO_Pin == GPIO_PIN_1) { // deteksi zvc untuk fasa S
 
 		delay_us(delay2);
-		if (delay1 + delay2 + delay3 < 8400) {
+		if (delay1 + delay2 + delay3 < 8400
+				&& delay1 + delay2 + delay3 > 5600) { // pin 13 high ketika delay < 8400 && delay > 5600 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
 		}
-		if (delay1 + delay2 + delay3 < 2800) {
+		if (delay1 + delay2 + delay3 < 2800) { // pin 14 high ketika delay < 2800 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
 		}
-		if (delay1 + delay2 + delay3 < 5600) {
+		if (delay1 + delay2 + delay3 < 5600
+				&& delay1 + delay2 + delay3 > 2800) { // pin 15 high ketika delay < 5600 && delay > 2800 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
 		}
 		delay_us(50);
 		if (counter > 0) {
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 		}
 	}
 
-	else if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)) {
+	else if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)) { // deteksi zvc untuk fasa T
 
 		delay_us(delay3);
 
-		if (delay1 + delay2 + delay3 < 5600) {
+		if (delay1 + delay2 + delay3 < 5600
+				&& delay1 + delay2 + delay3 > 2800) { // pin 13 high ketika delay < 5600 && delay > 2800 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
 		}
-		if (delay1 + delay2 + delay3 < 8400) {
+		if (delay1 + delay2 + delay3 < 8400
+				&& delay1 + delay2 + delay3 > 5600) { // pin 14 high ketika delay < 8400 && delay > 5600 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
 		}
-		if (delay1 + delay2 + delay3 < 2800) {
+		if (delay1 + delay2 + delay3 < 2800) { // pin 15 high ketika delay < 2800 microsecond
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
 		}
 		delay_us(50);
 		if (counter > 0) {
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 		}
 	}
