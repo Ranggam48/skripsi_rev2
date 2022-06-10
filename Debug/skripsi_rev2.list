@@ -1073,6 +1073,7 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
+//-------- fungsi callback timer interrupt untuk konvert waktu starting ke delay(microsecond) -------//
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
  800075c:	b580      	push	{r7, lr}
  800075e:	b084      	sub	sp, #16
@@ -1131,6 +1132,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 080007cc <HAL_GPIO_EXTI_Callback>:
 
+//-------------------------- fungsi callback untuk external interrupt pin A0, A1,dan A2 --------------------//
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80007cc:	b580      	push	{r7, lr}
  80007ce:	b082      	sub	sp, #8
@@ -1138,7 +1141,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80007d2:	4603      	mov	r3, r0
  80007d4:	80fb      	strh	r3, [r7, #6]
 
-	if (GPIO_Pin == GPIO_PIN_0) {
+	if (GPIO_Pin == GPIO_PIN_0) { // deteksi zvc untuk fasa R
  80007d6:	88fb      	ldrh	r3, [r7, #6]
  80007d8:	2b01      	cmp	r3, #1
  80007da:	d169      	bne.n	80008b0 <HAL_GPIO_EXTI_Callback+0xe4>
@@ -1148,7 +1151,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80007de:	681b      	ldr	r3, [r3, #0]
  80007e0:	4618      	mov	r0, r3
  80007e2:	f7ff fce1 	bl	80001a8 <delay_us>
-		if (delay1 + delay2 + delay3 < 2800) {
+		if (delay1 + delay2 + delay3 < 2800) { // pin 13 high ketika delay < 2800 microsecond
  80007e6:	4ba2      	ldr	r3, [pc, #648]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  80007e8:	681a      	ldr	r2, [r3, #0]
  80007ea:	4ba2      	ldr	r3, [pc, #648]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1176,7 +1179,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  8000816:	4413      	add	r3, r2
  8000818:	f5b3 5faf 	cmp.w	r3, #5600	; 0x15e0
  800081c:	d210      	bcs.n	8000840 <HAL_GPIO_EXTI_Callback+0x74>
-				&& delay1 + delay2 + delay3 > 2800) {
+				&& delay1 + delay2 + delay3 > 2800) { // pin 14 high ketika delay < 5600 && delay > 2800 microsecond
  800081e:	4b94      	ldr	r3, [pc, #592]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  8000820:	681a      	ldr	r2, [r3, #0]
  8000822:	4b94      	ldr	r3, [pc, #592]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1205,7 +1208,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  8000850:	f242 02cf 	movw	r2, #8399	; 0x20cf
  8000854:	4293      	cmp	r3, r2
  8000856:	d810      	bhi.n	800087a <HAL_GPIO_EXTI_Callback+0xae>
-				&& delay1 + delay2 + delay3 > 5600) {
+				&& delay1 + delay2 + delay3 > 5600) { // pin 15 high ketika delay < 8400 && delay > 5600 microsecond
  8000858:	4b85      	ldr	r3, [pc, #532]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  800085a:	681a      	ldr	r2, [r3, #0]
  800085c:	4b85      	ldr	r3, [pc, #532]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1245,14 +1248,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80008a4:	f44f 4100 	mov.w	r1, #32768	; 0x8000
  80008a8:	4874      	ldr	r0, [pc, #464]	; (8000a7c <HAL_GPIO_EXTI_Callback+0x2b0>)
  80008aa:	f000 ffaa 	bl	8001802 <HAL_GPIO_WritePin>
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
 		}
 	}
 }
  80008ae:	e0db      	b.n	8000a68 <HAL_GPIO_EXTI_Callback+0x29c>
-	else if (GPIO_Pin == GPIO_PIN_1) {
+	else if (GPIO_Pin == GPIO_PIN_1) { // deteksi zvc untuk fasa S
  80008b0:	88fb      	ldrh	r3, [r7, #6]
  80008b2:	2b02      	cmp	r3, #2
  80008b4:	d169      	bne.n	800098a <HAL_GPIO_EXTI_Callback+0x1be>
@@ -1273,7 +1276,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80008d0:	f242 02cf 	movw	r2, #8399	; 0x20cf
  80008d4:	4293      	cmp	r3, r2
  80008d6:	d810      	bhi.n	80008fa <HAL_GPIO_EXTI_Callback+0x12e>
-				&& delay1 + delay2 + delay3 > 5600) {
+				&& delay1 + delay2 + delay3 > 5600) { // pin 13 high ketika delay < 8400 && delay > 5600 microsecond
  80008d8:	4b65      	ldr	r3, [pc, #404]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  80008da:	681a      	ldr	r2, [r3, #0]
  80008dc:	4b65      	ldr	r3, [pc, #404]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1289,7 +1292,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80008f0:	f44f 5100 	mov.w	r1, #8192	; 0x2000
  80008f4:	4861      	ldr	r0, [pc, #388]	; (8000a7c <HAL_GPIO_EXTI_Callback+0x2b0>)
  80008f6:	f000 ff84 	bl	8001802 <HAL_GPIO_WritePin>
-		if (delay1 + delay2 + delay3 < 2800) {
+		if (delay1 + delay2 + delay3 < 2800) { // pin 14 high ketika delay < 2800 microsecond
  80008fa:	4b5d      	ldr	r3, [pc, #372]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  80008fc:	681a      	ldr	r2, [r3, #0]
  80008fe:	4b5d      	ldr	r3, [pc, #372]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1316,7 +1319,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  800092a:	4413      	add	r3, r2
  800092c:	f5b3 5faf 	cmp.w	r3, #5600	; 0x15e0
  8000930:	d210      	bcs.n	8000954 <HAL_GPIO_EXTI_Callback+0x188>
-				&& delay1 + delay2 + delay3 > 2800) {
+				&& delay1 + delay2 + delay3 > 2800) { // pin 15 high ketika delay < 5600 && delay > 2800 microsecond
  8000932:	4b4f      	ldr	r3, [pc, #316]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  8000934:	681a      	ldr	r2, [r3, #0]
  8000936:	4b4f      	ldr	r3, [pc, #316]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1340,9 +1343,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  800095c:	681b      	ldr	r3, [r3, #0]
  800095e:	2b00      	cmp	r3, #0
  8000960:	f000 8082 	beq.w	8000a68 <HAL_GPIO_EXTI_Callback+0x29c>
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
  8000964:	2200      	movs	r2, #0
- 8000966:	f44f 4180 	mov.w	r1, #16384	; 0x4000
+ 8000966:	f44f 5100 	mov.w	r1, #8192	; 0x2000
  800096a:	4844      	ldr	r0, [pc, #272]	; (8000a7c <HAL_GPIO_EXTI_Callback+0x2b0>)
  800096c:	f000 ff49 	bl	8001802 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
@@ -1357,7 +1360,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  8000984:	f000 ff3d 	bl	8001802 <HAL_GPIO_WritePin>
 }
  8000988:	e06e      	b.n	8000a68 <HAL_GPIO_EXTI_Callback+0x29c>
-	else if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)) {
+	else if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)) { // deteksi zvc untuk fasa T
  800098a:	2104      	movs	r1, #4
  800098c:	483d      	ldr	r0, [pc, #244]	; (8000a84 <HAL_GPIO_EXTI_Callback+0x2b8>)
  800098e:	f000 ff21 	bl	80017d4 <HAL_GPIO_ReadPin>
@@ -1380,7 +1383,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80009b0:	4413      	add	r3, r2
  80009b2:	f5b3 5faf 	cmp.w	r3, #5600	; 0x15e0
  80009b6:	d210      	bcs.n	80009da <HAL_GPIO_EXTI_Callback+0x20e>
-				&& delay1 + delay2 + delay3 > 2800) {
+				&& delay1 + delay2 + delay3 > 2800) { // pin 13 high ketika delay < 5600 && delay > 2800 microsecond
  80009b8:	4b2d      	ldr	r3, [pc, #180]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  80009ba:	681a      	ldr	r2, [r3, #0]
  80009bc:	4b2d      	ldr	r3, [pc, #180]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1408,7 +1411,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  80009ea:	f242 02cf 	movw	r2, #8399	; 0x20cf
  80009ee:	4293      	cmp	r3, r2
  80009f0:	d810      	bhi.n	8000a14 <HAL_GPIO_EXTI_Callback+0x248>
-				&& delay1 + delay2 + delay3 > 5600) {
+				&& delay1 + delay2 + delay3 > 5600) { // pin 14 high ketika delay < 8400 && delay > 5600 microsecond
  80009f2:	4b1f      	ldr	r3, [pc, #124]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  80009f4:	681a      	ldr	r2, [r3, #0]
  80009f6:	4b1f      	ldr	r3, [pc, #124]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1424,7 +1427,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  8000a0a:	f44f 4180 	mov.w	r1, #16384	; 0x4000
  8000a0e:	481b      	ldr	r0, [pc, #108]	; (8000a7c <HAL_GPIO_EXTI_Callback+0x2b0>)
  8000a10:	f000 fef7 	bl	8001802 <HAL_GPIO_WritePin>
-		if (delay1 + delay2 + delay3 < 2800) {
+		if (delay1 + delay2 + delay3 < 2800) { // pin 15 high ketika delay < 2800 microsecond
  8000a14:	4b16      	ldr	r3, [pc, #88]	; (8000a70 <HAL_GPIO_EXTI_Callback+0x2a4>)
  8000a16:	681a      	ldr	r2, [r3, #0]
  8000a18:	4b16      	ldr	r3, [pc, #88]	; (8000a74 <HAL_GPIO_EXTI_Callback+0x2a8>)
@@ -1448,9 +1451,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  8000a3e:	681b      	ldr	r3, [r3, #0]
  8000a40:	2b00      	cmp	r3, #0
  8000a42:	d011      	beq.n	8000a68 <HAL_GPIO_EXTI_Callback+0x29c>
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
  8000a44:	2200      	movs	r2, #0
- 8000a46:	f44f 4100 	mov.w	r1, #32768	; 0x8000
+ 8000a46:	f44f 5100 	mov.w	r1, #8192	; 0x2000
  8000a4a:	480c      	ldr	r0, [pc, #48]	; (8000a7c <HAL_GPIO_EXTI_Callback+0x2b0>)
  8000a4c:	f000 fed9 	bl	8001802 <HAL_GPIO_WritePin>
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
